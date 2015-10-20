@@ -1,5 +1,6 @@
 *.pyc
 *.pickle
+*.conf
 timestamp.log
 torrents
 .DS_store
