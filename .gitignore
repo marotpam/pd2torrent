@@ -1,0 +1,5 @@
+*.pyc
+*.pickle
+timestamp.log
+torrents
+.DS_store
