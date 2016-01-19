@@ -18,16 +18,17 @@ import datetime
 import gzip
 from input_arguments import get_input_arguments
 from pogdesign import get_episodes_aired_on_dates
-from kickass_torrents import get_tpb_torrent_for_episode
+from extratorrent import get_tpb_torrent_for_episode
 import pycurl
 
 """Downloads a file from a URL to the specified destination_folder"""
 def download_file_from_url(url, destination_folder):
-    download_url, filename = url.split("?title=")
-    output = destination_folder+"/"+filename+'.torrent'
+    """download_url, filename = url.split("?title=")"""
+    filename = url.split("/")[-1]
+    output = destination_folder+"/"+filename
 
     headers = { 'User-Agent': 'Mozilla/5.0 (Windows NT 6.0; WOW64; rv:24.0) Gecko/20100101 Firefox/24.0' } 
-    r = requests.get(download_url, headers=headers, stream=True)
+    r = requests.get(url, headers=headers, stream=True)
     with open(output, 'wb') as f:
         for chunk in r.iter_content(chunk_size=1024):
             if chunk:
