@@ -10,7 +10,7 @@ POGDESIGN_URL = "http://www.pogdesign.co.uk/cat/"
 
 """Gets html code from the page with the user logged in"""
 def get_login_html(username, password, url_date):
-    r = requests.post(POGDESIGN_URL, data={'username': username, 'password': password, 'sub_login': 'Account Login'}, allow_redirects=False)
+    r = requests.post(POGDESIGN_URL+'login', data={'username': username, 'password': password, 'sub_login': ''}, allow_redirects=False)
     page = requests.get(POGDESIGN_URL+url_date, cookies=r.cookies)
     return BeautifulSoup(page.text, "lxml")
 
@@ -61,11 +61,11 @@ def get_merged_episodes(episodes):
 
 
 def get_episode_info_from_link( episode_link ):
-    episode_info = episode_link[1].string.split( ' - ' )
-    title = episode_link[0].string[:-10]
-    season = (episode_info[0].split( ': ' )[1]).zfill(2)
-    episode = (episode_info[1].split( ': ' )[1]).zfill(2)
-    episode_info = {'title': str(title), 'season': str(season), 'episode': str(episode)}
+    title = episode_link[0].string
+    episode_info = episode_link[1].string
+    pattern = re.compile('\d+')
+    matches = pattern.findall(episode_link[1].string)
+    episode_info = {'title': str(title), 'season': str(matches[0]), 'episode': str(matches[1])}
     return episode_info
 
 
@@ -101,5 +101,4 @@ def get_episodes_aired_on_dates(username, password, dates):
 
         previous_date = current_date
         monthly_calendar_html_previous = monthly_calendar_html_current
-
     return episodes_aired_info

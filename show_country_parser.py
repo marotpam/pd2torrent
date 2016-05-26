@@ -86,7 +86,7 @@ def get_stored_shows_countries():
 def get_shows_countries(shows_summaries):
     shows_countries = {}
 
-    for show_name, show_summary_url_suffix in shows_summaries.iteritems():
+    for show_name, show_summary_url_suffix in shows_summaries.items():
         shows_countries[show_name] = get_show_country(show_summary_url_suffix)
 
     return shows_countries
