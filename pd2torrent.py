@@ -24,8 +24,6 @@ import threading
 import pycurl
 import os
 
-TORRENT_RETRIEVER_HEALTH_ENDPOINT = 'http://localhost:3000/health'
-
 """Opens magnet link"""
 def open_magnet_link(link):
     os.system("/usr/bin/open " + link)
@@ -39,8 +37,6 @@ def download_episodes(username, password, folder, dates, quality, tracker):
     aired_episodes = 0
 
     episodes = get_episodes_aired_on_dates(username, password, dates)
-
-    print(str(len(episodes)))
 
     for episode_info in episodes:
         torrent_url = get_torrent_for_episode(episode_info, quality, tracker)
@@ -56,15 +52,7 @@ def download_episodes(username, password, folder, dates, quality, tracker):
 
     return downloaded_episodes, aired_episodes
 
-def mustHaveTorrentRetrieverRunning():
-    try:
-        r = requests.get(TORRENT_RETRIEVER_HEALTH_ENDPOINT)
-    except:
-        print ("[ERROR] The torrent retriever must be running!")
-        sys.exit(1)
-
 def download_show_torrents(forced_args={}):
-    #mustHaveTorrentRetrieverRunning()
     (username, password, folder, dates, quality, tracker) = get_input_arguments(forced_args)
     t0 = datetime.datetime.now()
     try:
