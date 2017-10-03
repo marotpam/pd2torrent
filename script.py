@@ -2,7 +2,7 @@
 This is an example script that can be added to your cron to launch the pd2torrent.py script periodically
 Every time it is executed, it stores the date in a file called timestamp.log, stored inside the pd2torrent
 parent directory. Then, the next time it is used, it sets that date as the --start_date for the pd2torrent.py
-This way, it downloads all your episodes from the last time it was executed. The first time it will only 
+This way, it downloads all your episodes from the last time it was executed. The first time it will only
 download episodes for that day and it will create the timestamp.log file as mentioned above.
 Please make sure this script and pd2torrent.py are both runnable before launching them
 """

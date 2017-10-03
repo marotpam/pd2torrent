@@ -25,6 +25,8 @@ import pycurl
 import os
 
 """Opens magnet link"""
+
+
 def open_magnet_link(link):
     os.system("/usr/bin/open " + link)
 
@@ -32,6 +34,8 @@ def open_magnet_link(link):
 """
 This method downloads episodes followed by @username aired on @dates to @folder
 """
+
+
 def download_episodes(username, password, folder, dates, quality, tracker):
     downloaded_episodes = 0
     aired_episodes = 0
@@ -41,7 +45,9 @@ def download_episodes(username, password, folder, dates, quality, tracker):
     for episode_info in episodes:
         torrent_url = get_torrent_for_episode(episode_info, quality, tracker)
         if torrent_url:
-            t = threading.Thread(target=open_magnet_link, args=(torrent_url,), daemon=True)
+            t = threading.Thread(
+                target=open_magnet_link, args=(
+                    torrent_url,), daemon=True)
             t.start()
 
             downloaded_episodes += 1
@@ -52,18 +58,23 @@ def download_episodes(username, password, folder, dates, quality, tracker):
 
     return downloaded_episodes, aired_episodes
 
+
 def download_show_torrents(forced_args={}):
-    (username, password, folder, dates, quality, tracker) = get_input_arguments(forced_args)
+    (username, password, folder, dates, quality,
+     tracker) = get_input_arguments(forced_args)
     t0 = datetime.datetime.now()
     try:
-        downloaded_episodes, aired_episodes = download_episodes(username, password, folder, dates, quality, tracker)
+        downloaded_episodes, aired_episodes = download_episodes(
+            username, password, folder, dates, quality, tracker)
         time_elapsed = datetime.datetime.now() - t0
-        print ("{0}/{1} episodes downloaded in {2}".format(downloaded_episodes, aired_episodes, time_elapsed))
+        print ("{0}/{1} episodes downloaded in {2}".format(downloaded_episodes,
+                                                           aired_episodes, time_elapsed))
         return 1
     except requests.exceptions.ConnectionError as error:
         print (error)
         print ("Ooops, looks like you have no internet connection :(")
         return -1
+
 
 if __name__ == "__main__":
     download_show_torrents()

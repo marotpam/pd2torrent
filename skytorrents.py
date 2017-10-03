@@ -13,17 +13,22 @@ import re
 SKYTORRENTS_URL = "https://www.skytorrents.in"
 
 """Gets the html code from the specified URL using BeautifulSoup library"""
+
+
 def get_html(url):
     page = urllib.request.urlopen(url)
 
     if page.info().get('Content-Encoding') == 'gzip':
-        buf = BytesIO( page.read())
+        buf = BytesIO(page.read())
         f = gzip.GzipFile(fileobj=buf)
         page = f.read()
 
     return BeautifulSoup(page, "lxml")
 
+
 """Encodes a string to be able to represent a URL"""
+
+
 def urlencode(title):
     title = title.lower()
     removed = [' (uk)', ' (us)', ':', '&', '\'', '!']
@@ -32,25 +37,45 @@ def urlencode(title):
 
     return title.strip().replace(' ', '%20')
 
+
 """Returns a dictionary with id->name pairs for the torrents matching tpb_search_url"""
-def get_torrent_url(episode_info, quality = '', tracker = ''):
+
+
+def get_torrent_url(episode_info, quality='', tracker=''):
     urls = []
 
-    query_string = urlencode( episode_info['title'] + " s" + episode_info['season'] + "e" + episode_info['episode'] + " " + quality + " " + tracker )
+    query_string = urlencode(
+        episode_info['title'] +
+        " s" +
+        episode_info['season'] +
+        "e" +
+        episode_info['episode'] +
+        " " +
+        quality +
+        " " +
+        tracker)
     search_url = SKYTORRENTS_URL + "/search/all/ed/1/?q=" + query_string
     html_content = get_html(search_url)
     torrent_links = html_content.select('a[href^="magnet:"]')
 
-    if len(torrent_links) == 0: return ""
-    
+    if len(torrent_links) == 0:
+        return ""
+
     return torrent_links[0]["href"]
 
-def get_torrent_for_episode( episode_info, quality, tracker ):
-    print ('Searching torrents for ' + episode_info['title'] + " s" + episode_info['season'] + "e" + episode_info['episode'])
 
-    episode_url = get_torrent_url( episode_info, quality )
+def get_torrent_for_episode(episode_info, quality, tracker):
+    print (
+        'Searching torrents for ' +
+        episode_info['title'] +
+        " s" +
+        episode_info['season'] +
+        "e" +
+        episode_info['episode'])
+
+    episode_url = get_torrent_url(episode_info, quality)
     if not episode_url:
-        episode_url = get_torrent_url( episode_info )
+        episode_url = get_torrent_url(episode_info)
         if not episode_url:
             return ""
 
