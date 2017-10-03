@@ -46,10 +46,10 @@ def get_all_shows_in_pogdesign():
     show_summaries = {}
 
     html = get_html(POGDESIGN_ALL_SHOWS_URL)
-    show_divs = html.find_all(class_='label_check')
+    show_divs = html.find_all(class_='selectgrp')
 
     for show_div in show_divs:
-        show_name = show_div.strong.text
+        show_name = show_div.strong.text.split("\n")[0]
         show_summary_suffix = show_div.a['href'][1:]
 
         show_summaries[str(show_name)] = str(show_summary_suffix)
@@ -60,7 +60,7 @@ def get_show_country(show_summary_url_suffix):
     show_summary_url = POGDESIGN_URL + show_summary_url_suffix
     html_show_summary = get_html(show_summary_url)
 
-    summary_data_divs = html_show_summary.find(class_='sumdata').find_all('div')
+    summary_data_divs = html_show_summary.find(class_='furtherinfo').find_all('li')
 
     text_summary_country = summary_data_divs[3].text
     (dummy_text, show_country) = text_summary_country.split(' : ')
@@ -86,22 +86,17 @@ def get_stored_shows_countries():
 def get_shows_countries(shows_summaries):
     shows_countries = {}
 
-    for show_name, show_summary_url_suffix in shows_summaries.items():
-        shows_countries[show_name] = get_show_country(show_summary_url_suffix)
+    for show_summary_url_suffix in shows_summaries:
+        shows_countries[show_summary_url_suffix] = get_show_country(show_summary_url_suffix)
 
     return shows_countries
 
 def find_missing_shows_countries():
     stored_shows = get_stored_shows_countries()
     all_shows_summaries = get_all_shows_in_pogdesign()
-    missing_shows = [missing_show for missing_show in all_shows_summaries.keys() if missing_show not in stored_shows.keys()]
+    missing_shows = [show for show in all_shows_summaries.values() if show not in stored_shows.keys()]
 
-    missing_shows_summaries = {}
-
-    for missing_show in missing_shows:
-        missing_shows_summaries[missing_show] = all_shows_summaries[missing_show]
-
-    missing_shows_countries = get_shows_countries(missing_shows_summaries)
+    missing_shows_countries = get_shows_countries(missing_shows)
 
     refreshed_shows_countries = stored_shows.copy()
     refreshed_shows_countries.update(missing_shows_countries)
@@ -116,7 +111,7 @@ def get_shows_from(country_name):
     return [show for show in shows_countries.keys() if shows_countries[show] == country_name]
 
 def get_american_shows():
-    return get_shows_from('USA')
+    return get_shows_from('United States') + get_shows_from('Canada')
 
 def get_british_shows():
     return get_shows_from('United Kingdom')
