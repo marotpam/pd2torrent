@@ -9,6 +9,7 @@ are incorrect, all tv shows will be downloaded without any notice
 """
 
 import os
+import sys
 import urllib
 import requests
 import subprocess
@@ -18,23 +19,16 @@ import datetime
 import gzip
 from input_arguments import get_input_arguments
 from pogdesign import get_episodes_aired_on_dates
-from extratorrent import get_tpb_torrent_for_episode
+from skytorrents import get_torrent_for_episode
+import threading
 import pycurl
+import os
 
-"""Downloads a file from a URL to the specified destination_folder"""
-def download_file_from_url(url, destination_folder):
-    """download_url, filename = url.split("?title=")"""
-    filename = url.split("/")[-1]
-    output = destination_folder+"/"+filename
+TORRENT_RETRIEVER_HEALTH_ENDPOINT = 'http://localhost:3000/health'
 
-    headers = { 'User-Agent': 'Mozilla/5.0 (Windows NT 6.0; WOW64; rv:24.0) Gecko/20100101 Firefox/24.0' } 
-    r = requests.get(url, headers=headers, stream=True)
-    with open(output, 'wb') as f:
-        for chunk in r.iter_content(chunk_size=1024):
-            if chunk:
-                f.write(chunk)
-                f.flush()
-
+"""Opens magnet link"""
+def open_magnet_link(link):
+    os.system("/usr/bin/open " + link)
 
 
 """
@@ -46,11 +40,15 @@ def download_episodes(username, password, folder, dates, quality, tracker):
 
     episodes = get_episodes_aired_on_dates(username, password, dates)
 
+    print(str(len(episodes)))
+
     for episode_info in episodes:
-        torrent_url = get_tpb_torrent_for_episode(episode_info, quality, tracker)
+        torrent_url = get_torrent_for_episode(episode_info, quality, tracker)
         if torrent_url:
+            t = threading.Thread(target=open_magnet_link, args=(torrent_url,), daemon=True)
+            t.start()
+
             downloaded_episodes += 1
-            download_file_from_url(torrent_url, folder)
             print('OK :)')
         else:
             print('KO :(')
@@ -58,8 +56,15 @@ def download_episodes(username, password, folder, dates, quality, tracker):
 
     return downloaded_episodes, aired_episodes
 
+def mustHaveTorrentRetrieverRunning():
+    try:
+        r = requests.get(TORRENT_RETRIEVER_HEALTH_ENDPOINT)
+    except:
+        print ("[ERROR] The torrent retriever must be running!")
+        sys.exit(1)
 
 def download_show_torrents(forced_args={}):
+    #mustHaveTorrentRetrieverRunning()
     (username, password, folder, dates, quality, tracker) = get_input_arguments(forced_args)
     t0 = datetime.datetime.now()
     try:
@@ -67,7 +72,8 @@ def download_show_torrents(forced_args={}):
         time_elapsed = datetime.datetime.now() - t0
         print ("{0}/{1} episodes downloaded in {2}".format(downloaded_episodes, aired_episodes, time_elapsed))
         return 1
-    except requests.exceptions.ConnectionError:
+    except requests.exceptions.ConnectionError as error:
+        print (error)
         print ("Ooops, looks like you have no internet connection :(")
         return -1
 
