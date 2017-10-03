@@ -4,3 +4,4 @@
 timestamp.log
 torrents
 .DS_store
+node_modules/*
