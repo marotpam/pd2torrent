@@ -5,14 +5,18 @@ from show_country_parser import get_british_shows
 from date_helper import *
 
 
-POGDESIGN_URL = "http://www.pogdesign.co.uk/cat/"
+POGDESIGN_URL = "https://www.pogdesign.co.uk/cat/"
 
 
 """Gets html code from the page with the user logged in"""
 def get_login_html(username, password, url_date):
-    r = requests.post(POGDESIGN_URL+'login', data={'username': username, 'password': password, 'sub_login': ''}, allow_redirects=False)
-    page = requests.get(POGDESIGN_URL+url_date, cookies=r.cookies)
-    return BeautifulSoup(page.text, "lxml")
+    with requests.Session() as c:
+        login_data = {'username': username, 'password': password, 'sub_login': ''}
+        headers_data = {"Referer":"https://www.pogdesign.co.uk/cat/login"}
+        r = c.post(POGDESIGN_URL+'login', data=login_data, headers=headers_data, allow_redirects=True)
+
+        page = c.get(POGDESIGN_URL+url_date)
+        return BeautifulSoup(page.text, "lxml")
 
 
 def get_downloadable_episodes(today_episodes, yesterday_episodes):
@@ -21,11 +25,11 @@ def get_downloadable_episodes(today_episodes, yesterday_episodes):
     american_shows  = get_american_shows()
 
     for episode in today_episodes:
-        if episode['title'] in american_shows:
+        if episode['summary'] in american_shows:
             downloadable_episodes.append(episode)
 
     for episode in yesterday_episodes:
-        if episode['title'] in british_shows:
+        if episode['summary'] in british_shows:
             downloadable_episodes.append(episode)
 
     return downloadable_episodes
@@ -61,11 +65,12 @@ def get_merged_episodes(episodes):
 
 
 def get_episode_info_from_link( episode_link ):
+    summary = 'cat/' + episode_link[0]['href']
     title = episode_link[0].string
     episode_info = episode_link[1].string
     pattern = re.compile('\d+')
     matches = pattern.findall(episode_link[1].string)
-    episode_info = {'title': str(title), 'season': str(matches[0]), 'episode': str(matches[1])}
+    episode_info = {'title': str(title), 'season': str(matches[0]), 'episode': str(matches[1]), 'summary': summary}
     return episode_info
 
 
