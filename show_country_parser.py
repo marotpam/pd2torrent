@@ -18,13 +18,12 @@ from io import StringIO
 import gzip
 import pickle
 
-POGDESIGN_URL = "http://www.pogdesign.co.uk/cat/"
-POGDESIGN_ALL_SHOWS_URL = "http://www.pogdesign.co.uk/cat/showselect.php"
+POGDESIGN_URL = "https://www.pogdesign.co.uk/"
+POGDESIGN_ALL_SHOWS_URL = "https://www.pogdesign.co.uk/cat/showselect.php"
 
 SHOWS_DICT_FILENAME = 'shows_countries.pickle'
 
 """Gets the html code from the specified URL using BeautifulSoup library"""
-
 
 def get_html(url):
     page = urllib.request.urlopen(url)
