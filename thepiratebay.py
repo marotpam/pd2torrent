@@ -10,7 +10,7 @@ import gzip
 from date_helper import *
 import re
 
-SKYTORRENTS_URL = "https://www.skytorrents.in"
+THEPIRATEBAY_URL = "https://thepiratebay.cr/"
 
 """Gets the html code from the specified URL using BeautifulSoup library"""
 
@@ -54,7 +54,7 @@ def get_torrent_url(episode_info, quality='', tracker=''):
         quality +
         " " +
         tracker)
-    search_url = SKYTORRENTS_URL + "/search/all/ed/1/?q=" + query_string
+    search_url = THEPIRATEBAY_URL + "/search/" + query_string + "/0/7/0"
     html_content = get_html(search_url)
     torrent_links = html_content.select('a[href^="magnet:"]')
 

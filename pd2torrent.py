@@ -14,7 +14,7 @@ import threading
 import requests
 from input_arguments import get_input_arguments
 from pogdesign import get_episodes_aired_on_dates
-from skytorrents import get_torrent_for_episode
+from thepiratebay import get_torrent_for_episode
 
 def open_magnet_link(link):
     os.system("/usr/bin/open " + link)
